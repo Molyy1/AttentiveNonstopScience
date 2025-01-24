@@ -13,14 +13,19 @@ app.get('/poli', async (req, res) => {
     }
 
     try {
+        let response;
+
         if (type === 'text') {
             // Call Pollinations Text API
-            const response = await axios.get(`https://text.pollinations.ai/${encodeURIComponent(prompt)}`);
-            return res.json({ result: response.data });
+            response = await axios.get(`https://text.pollinations.ai/${encodeURIComponent(prompt)}`);
+            res.json({ result: response.data });
         } else {
-            // Generate image link
-            const imageUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?nologo=true`;
-            return res.json({ imageUrl });
+            // Call Pollinations Image API
+            response = await axios.get(`https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}`, {
+                responseType: 'arraybuffer',
+            });
+            res.setHeader('Content-Type', 'image/jpeg');
+            res.send(response.data);
         }
     } catch (error) {
         console.error(error);
